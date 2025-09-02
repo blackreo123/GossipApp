@@ -104,9 +104,12 @@ struct ContentView: View {
                                 .foregroundColor(.white.opacity(0.7))
                                 
                                 Button("전송") {
-                                    gossipManager.sendGossip(newMessage)
-                                    isComposing = false
-                                    newMessage = ""
+                                    Task {
+                                       try await gossipManager.sendGossip(newMessage)
+                                        isComposing = false
+                                        newMessage = ""
+                                    }
+                                    
                                 }
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)

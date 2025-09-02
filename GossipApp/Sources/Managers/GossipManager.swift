@@ -76,7 +76,7 @@ class GossipManager: ObservableObject {
         socket?.disconnect()
     }
     
-    func sendGossip(_ content: String) {
+    func sendGossip(_ content: String) async throws {
         let url = URL(string: "http://localhost:3000/api/gossip")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -94,16 +94,14 @@ class GossipManager: ObservableObject {
             return
         }
         
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            if let error = error {
-                print("❌ 전송 오류: \(error)")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self?.dailyUsage += 1
-                print("✅ 뒷담화 전송 완료")
-            }
-        }.resume()
+        let (_, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        self.dailyUsage += 1
+        print("✅ 뒷담화 전송 완료")
     }
 }
