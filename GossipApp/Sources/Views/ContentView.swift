@@ -52,11 +52,12 @@ struct ContentView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 24)
                             
-                            if gossipManager.timeLeft > 0 {
-                                Text("\(gossipManager.timeLeft)초")
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.7))
-                            }
+//                            if gossipManager.timeLeft > 0 {
+//                                Text("\(gossipManager.timeLeft)초")
+//                                    .font(.caption)
+//                                    .foregroundColor(.white.opacity(0.7))
+//                            }
+                            CountdownBarView(timeLeft: gossipManager.timeLeft)
                         } else {
                             VStack(spacing: 12) {
                                 Text("😶‍🌫️")
@@ -104,9 +105,16 @@ struct ContentView: View {
                                 .foregroundColor(.white.opacity(0.7))
                                 
                                 Button("전송") {
-                                    gossipManager.sendGossip(newMessage)
-                                    isComposing = false
-                                    newMessage = ""
+                                    Task {
+                                        do {
+                                            try await gossipManager.sendGossip(newMessage)
+                                            isComposing = false
+                                            newMessage = ""
+                                        } catch {
+                                            print("에러어어: \(error)")
+                                        }
+                                        
+                                    }
                                 }
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
