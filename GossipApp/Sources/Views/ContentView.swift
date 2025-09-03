@@ -21,34 +21,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // 중앙: 메시지 표시 영역
-                    VStack(spacing: 16) {
-                        if let currentGossip = gossipManager.currentGossip {
-                            Text(currentGossip)
-                                .font(.title2)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 24)
-                            
-                            CountdownBarView(timeLeft: gossipManager.timeLeft)
-                        } else {
-                            VStack(spacing: 12) {
-                                Text("😶‍🌫️")
-                                    .font(.system(size: 48))
-                                
-                                Text("조용하네요")
-                                    .font(.title3)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.white.opacity(0.8))
-                                
-                                Text("답답한 마음을 적어보세요!")
-                                    .font(.body)
-                                    .foregroundColor(.white.opacity(0.6))
-                            }
-                        }
-                    }
-                    .frame(height: 200)
+                    GossipDisplayView(currentGossip: gossipManager.currentGossip, timeLeft: gossipManager.timeLeft)
                     
                     Spacer()
                     
