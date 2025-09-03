@@ -34,6 +34,11 @@ struct ContentView: View {
         }
         .onAppear {
             gossipManager.connect()
+            
+            // 연결 후 사용량 가져오기
+            Task {
+                try? await gossipManager.getUsage()
+            }
         }
         .onDisappear {
             gossipManager.disconnect()

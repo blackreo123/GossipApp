@@ -108,10 +108,35 @@ class GossipManager: ObservableObject {
             throw URLError(.badServerResponse)
         }
         
-//        let responseBody = try JSONDecoder().decode(UsageResponse.self, from: data)
+        let responseBody = try JSONDecoder().decode(GossipResponse.self, from: data)
         
-//        self.dailyUsage = responseBody.usage
-        self.dailyUsage += 1
+        self.dailyUsage = responseBody.userUsage
+
         print("✅ 뒷담화 전송 완료")
+    }
+    
+    func getUsage() async throws {
+        let url = URL(string: "http://localhost:3000/api/usage/\(deviceId)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            
+            
+            // 에러 응답 파싱 시도
+            if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                print(errorResponse.error)
+                throw URLError(.userCancelledAuthentication) // 또는 다른 적절한 에러
+            }
+            
+            throw URLError(.badServerResponse)
+        }
+        
+        let responseBody = try JSONDecoder().decode(UsageResponse.self, from: data)
+        self.dailyUsage = responseBody.usage
+        print("✅ usage get 완료")
     }
 }
