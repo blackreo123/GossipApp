@@ -26,7 +26,12 @@ class GossipManager: ObservableObject {
     private func setupSocket() {
         manager = SocketManager(
             socketURL: URL(string: "http://localhost:3000")!,
-            config: [.log(false), .compress]
+            config: [.log(false),
+                     .compress,
+                     .reconnects(true),
+                     .reconnectAttempts(5),
+                     .reconnectWait(2)
+            ]
         )
         socket = manager?.defaultSocket
         
