@@ -41,6 +41,11 @@ class GossipManager: ObservableObject {
             self?.isConnected = false
         }
         
+        socket?.on(clientEvent: .error) { [weak self] data, _ in
+            print("❌ Socket 에러: \(data)")
+            self?.isConnected = false
+        }
+        
         // 뒷담화 표시 이벤트
         socket?.on("gossip-display") { [weak self] data, _ in
             guard let responseData = data[0] as? [String: Any] else { return }
