@@ -91,6 +91,7 @@ class GossipManager: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 10.0
         
         let body = [
             "content": content,
@@ -129,6 +130,7 @@ class GossipManager: ObservableObject {
         let url = URL(string: "http://localhost:3000/api/usage/\(deviceId)")!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        request.timeoutInterval = 5.0
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
