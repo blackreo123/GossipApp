@@ -7,6 +7,12 @@
 [![Tuist](https://img.shields.io/badge/Tuist-4.65.0-green.svg)](https://tuist.io/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## 스크린샷
+
+<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 16 Pro - 2025-09-04 at 19 11 45" src="https://github.com/user-attachments/assets/5bd9ac03-2ed5-4861-b7d7-728c2bd4e91c" />
+<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 16 Pro - 2025-09-04 at 19 12 03" src="https://github.com/user-attachments/assets/7b5952a8-77cb-4f06-8f6b-5bae93c4b652" />
+<img width="1206" height="2622" alt="Simulator Screenshot - iPhone 16 Pro - 2025-09-04 at 19 12 11" src="https://github.com/user-attachments/assets/8a24eb69-d77d-4475-beb1-36fea110156d" />
+
 ## ✨ 주요 기능
 
 - 🕵️ **완전 익명**: 사용자 식별 불가능, 개인정보 수집 최소화
