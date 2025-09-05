@@ -87,7 +87,24 @@ class GossipManager: ObservableObject {
     }
     
     func sendGossip(_ content: String) async throws {
-        let url = URL(string: "http://localhost:3000/api/gossip")!
+        let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard trimmedContent.isEmpty else {
+            throw GossipError.emptyContent
+        }
+        
+        guard content.count <= 50 else {
+            throw GossipError.contentTooLong
+        }
+        
+        guard dailyUsage < 3 else {
+            throw GossipError.dailyLimitReached
+        }
+        
+        guard let url = URL(string: "http://localhost:3000/api/gossip") else {
+            throw GossipError.invalidURL
+        }
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -102,21 +119,22 @@ class GossipManager: ObservableObject {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
         } catch {
             print("❌ JSON 직렬화 오류: \(error)")
+            throw GossipError.serializationError
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            
-            
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GossipError.invalidResponse
+        }
+              
+        guard (200...299).contains(httpResponse.statusCode) else {
             // 에러 응답 파싱 시도
             if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
                 print(errorResponse.error)
-                throw URLError(.userCancelledAuthentication) // 또는 다른 적절한 에러
+                throw GossipError.serverError(errorResponse.error)
             }
-            
-            throw URLError(.badServerResponse)
+            throw GossipError.httpError(httpResponse.statusCode)
         }
         
         let responseBody = try JSONDecoder().decode(GossipResponse.self, from: data)
@@ -127,28 +145,68 @@ class GossipManager: ObservableObject {
     }
     
     func getUsage() async throws {
-        let url = URL(string: "http://localhost:3000/api/usage/\(deviceId)")!
+        guard let url = URL(string: "http://localhost:3000/api/usage/\(deviceId)") else {
+            throw GossipError.invalidURL
+        }
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.timeoutInterval = 5.0
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            
-            
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw GossipError.invalidResponse
+        }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
             // 에러 응답 파싱 시도
             if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
                 print(errorResponse.error)
-                throw URLError(.userCancelledAuthentication) // 또는 다른 적절한 에러
+                throw GossipError.serverError(errorResponse.error)
             }
             
-            throw URLError(.badServerResponse)
+            throw GossipError.httpError(httpResponse.statusCode)
         }
         
         let responseBody = try JSONDecoder().decode(UsageResponse.self, from: data)
         self.dailyUsage = responseBody.usage
         print("✅ usage get 완료")
+    }
+}
+
+// MARK: - Custom Error Types
+enum GossipError: LocalizedError {
+    case emptyContent
+    case contentTooLong
+    case dailyLimitReached
+    case invalidURL
+    case serializationError
+    case invalidResponse
+    case networkError
+    case httpError(Int)
+    case serverError(String)
+    
+    var errorDescription: String? {
+        switch self {
+        case .emptyContent:
+            return "내용을 입력해주세요"
+        case .contentTooLong:
+            return "50자를 초과할 수 없습니다"
+        case .dailyLimitReached:
+            return "하루 3번까지만 사용할 수 있습니다"
+        case .invalidURL:
+            return "잘못된 서버 주소입니다"
+        case .serializationError:
+            return "데이터 변환 오류"
+        case .invalidResponse:
+            return "잘못된 서버 응답"
+        case .networkError:
+            return "네트워크 연결을 확인해주세요"
+        case .httpError(let code):
+            return "서버 오류 (코드: \(code))"
+        case .serverError(let message):
+            return message
+        }
     }
 }
