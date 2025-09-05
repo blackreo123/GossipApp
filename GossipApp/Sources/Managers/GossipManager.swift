@@ -89,7 +89,7 @@ class GossipManager: ObservableObject {
     func sendGossip(_ content: String) async throws {
         let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        guard trimmedContent.isEmpty else {
+        guard !trimmedContent.isEmpty else {
             throw GossipError.emptyContent
         }
         
