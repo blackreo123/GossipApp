@@ -10,13 +10,19 @@ import SwiftUI
 
 struct ComposeButtonView: View {
     @ObservedObject var gossipManager: GossipManager
+    @ObservedObject var toastManager: ToastManager
     @Binding var isComposing: Bool
     @Binding var newMessage: String
     
-    
+    private let successMessages = [
+        "불만을 소리쳤습니다...",
+        "마음이 한결 가벼워졌어요",
+        "속이 시원하게 털어냈네요!",
+        "답답함을 날려버렸습니다!",
+        "세상에 외쳤습니다!"
+    ]
     
     var body: some View {
-        // 하단: 작성 버튼 또는 입력창
         if isComposing {
             VStack(spacing: 16) {
                 TextField("뒷담화를 입력하세요...", text: $newMessage)
@@ -48,10 +54,12 @@ struct ComposeButtonView: View {
                                 try await gossipManager.sendGossip(newMessage)
                                 isComposing = false
                                 newMessage = ""
+                                toastManager.showSuccess(successMessages.randomElement() ?? "불만을 소리쳤습니다...")
+                            } catch let error as GossipError {
+                                toastManager.show(error.toastMessage)
                             } catch {
-                                print("에러어어: \(error)")
+                                toastManager.showError("An unexpected error occurred.")
                             }
-                            
                         }
                     }
                     .fontWeight(.semibold)
