@@ -48,6 +48,16 @@ struct ContentView: View {
         .onDisappear {
             gossipManager.disconnect()
         }
+        .onChange(of: gossipManager.isConnected) { oldValue, newValue in
+            switch (oldValue, newValue) {
+            case (false, true):
+                toastManager.showSuccess("서버에 연결되었습니다!")
+            case (true, false):
+                toastManager.showError("연결이 끊어졌습니다")
+            default:
+                break
+            }
+        }
     }
 }
 
