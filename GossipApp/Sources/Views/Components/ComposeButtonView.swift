@@ -11,6 +11,7 @@ import SwiftUI
 struct ComposeButtonView: View {
     @ObservedObject var gossipManager: GossipManager
     @ObservedObject var toastManager: ToastManager
+    @StateObject private var contentFilter = ContentFilterService()
     @Binding var isComposing: Bool
     @Binding var newMessage: String
     
@@ -51,7 +52,8 @@ struct ComposeButtonView: View {
                     Button("전송") {
                         Task {
                             do {
-                                try await gossipManager.sendGossip(newMessage)
+                                let filterdMessage = await contentFilter.filterContent(newMessage)
+                                try await gossipManager.sendGossip(filterdMessage)
                                 isComposing = false
                                 newMessage = ""
                                 toastManager.showSuccess(successMessages.randomElement() ?? "불만을 소리쳤습니다...")
