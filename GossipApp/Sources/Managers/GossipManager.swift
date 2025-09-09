@@ -23,9 +23,21 @@ class GossipManager: ObservableObject {
         setupSocket()
     }
     
+    private var serverURL: String {
+    #if DEBUG
+        return "http://localhost:3000"  // 개발용 로컬 서버
+    #else
+        return "https://gossip-server-production.up.railway.app"  // 실제 프로덕션 서버
+    #endif
+    }
+    
     private func setupSocket() {
+        guard let url = URL(string: serverURL) else {
+            print("❌ 잘못된 서버 URL: \(serverURL)")
+            return
+        }
         manager = SocketManager(
-            socketURL: URL(string: "http://localhost:3000")!,
+            socketURL: url,
             config: [.log(false),
                      .compress,
                      .reconnects(true),
@@ -101,7 +113,7 @@ class GossipManager: ObservableObject {
             throw GossipError.dailyLimitReached
         }
         
-        guard let url = URL(string: "http://localhost:3000/api/gossip") else {
+        guard let url = URL(string: "\(serverURL)/api/gossip") else {
             throw GossipError.invalidURL
         }
         
@@ -145,7 +157,7 @@ class GossipManager: ObservableObject {
     }
     
     func getUsage() async throws {
-        guard let url = URL(string: "http://localhost:3000/api/usage/\(deviceId)") else {
+        guard let url = URL(string: "\(serverURL)/api/usage/\(deviceId)") else {
             throw GossipError.invalidURL
         }
         
