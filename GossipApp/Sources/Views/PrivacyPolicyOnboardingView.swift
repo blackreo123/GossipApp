@@ -27,7 +27,6 @@ struct ContentHeightPreferenceKey: PreferenceKey {
 struct PrivacyPolicyOnboardingView: View {
     @Binding var hasAgreed: Bool
     @State private var hasScrolledToBottom = false
-    @State private var showingAlert = false
     @State private var scrollOffset: CGFloat = 0
     @State private var contentHeight: CGFloat = 0
     @State private var scrollViewHeight: CGFloat = 0
@@ -135,8 +134,6 @@ struct PrivacyPolicyOnboardingView: View {
                         withAnimation(.spring()) {
                             hasAgreed = true
                         }
-                    } else {
-                        showingAlert = true
                     }
                 }) {
                     HStack {
@@ -158,11 +155,6 @@ struct PrivacyPolicyOnboardingView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
-        }
-        .alert("안내", isPresented: $showingAlert) {
-            Button("확인") { }
-        } message: {
-            Text("개인정보처리방침을 끝까지 읽어주세요.")
         }
     }
     
