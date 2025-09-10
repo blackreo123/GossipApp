@@ -8,28 +8,9 @@
 import Foundation
 import SwiftUI
 
-// ScrollView의 오프셋을 추적하기 위한 PreferenceKey
-struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
-// Content 높이를 추적하기 위한 PreferenceKey
-struct ContentHeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 struct PrivacyPolicyOnboardingView: View {
     @Binding var hasAgreed: Bool
     @State private var hasScrolledToBottom = false
-    @State private var scrollOffset: CGFloat = 0
-    @State private var contentHeight: CGFloat = 0
-    @State private var scrollViewHeight: CGFloat = 0
     
     var body: some View {
         ZStack {
@@ -60,10 +41,20 @@ struct PrivacyPolicyOnboardingView: View {
                 .padding(.top, 40)
                 .padding(.bottom, 30)
                 
-                GeometryReader { scrollViewGeometry in
+                ScrollViewReader { proxy in
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 20) {
+                        LazyVStack(alignment: .leading, spacing: 20) {
                             privacyPolicyContent
+                            
+                            // 스크롤 끝 감지용 투명 뷰
+                            Color.clear
+                                .frame(height: 1)
+                                .id("bottom")
+                                .onAppear {
+                                    withAnimation(.spring()) {
+                                        hasScrolledToBottom = true
+                                    }
+                                }
                         }
                         .padding()
                         .background(
@@ -71,58 +62,6 @@ struct PrivacyPolicyOnboardingView: View {
                                 .fill(Color.white.opacity(0.1))
                         )
                         .padding(.horizontal)
-                        .background(
-                            GeometryReader { contentGeometry in
-                                Color.clear
-                                    .preference(
-                                        key: ContentHeightPreferenceKey.self,
-                                        value: contentGeometry.size.height
-                                    )
-                                    .preference(
-                                        key: ScrollOffsetPreferenceKey.self,
-                                        value: contentGeometry.frame(in: .named("scroll")).minY
-                                    )
-                            }
-                        )
-                    }
-                    .coordinateSpace(name: "scroll")
-                    .onAppear {
-                        scrollViewHeight = scrollViewGeometry.size.height
-                    }
-                    .onPreferenceChange(ContentHeightPreferenceKey.self) { height in
-                        contentHeight = height
-                    }
-                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                        
-                        scrollOffset = offset
-                        
-                        // 스크롤 가능한 콘텐츠인지 먼저 체크
-                        if contentHeight > scrollViewHeight {
-                            // 실제 스크롤된 거리 계산
-                            // offset이 0에서 시작해서 음수로 감소함
-                            let scrolledDistance = -offset
-                            
-                            // 전체 스크롤 가능 거리
-                            let maxScrollDistance = contentHeight - scrollViewHeight
-                            
-                            // 바닥까지의 남은 거리
-                            let remainingDistance = maxScrollDistance - scrolledDistance
-                            
-                            // 바닥에서 20포인트 이내면 도달한 것으로 간주
-                            if remainingDistance <= 20 {
-                                if !hasScrolledToBottom {
-                                    DispatchQueue.main.async {
-                                        withAnimation(.spring()) {
-                                            hasScrolledToBottom = true
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            // 콘텐츠가 화면보다 작으면 스크롤 불필요
-                            // 이 경우는 자동으로 활성화하거나, 아니면 비활성화 유지
-                            // 여기서는 비활성화 유지
-                        }
                     }
                 }
                 
@@ -151,7 +90,6 @@ struct PrivacyPolicyOnboardingView: View {
                     )
                 }
                 .disabled(!hasScrolledToBottom)
-                .animation(.easeInOut(duration: 0.3), value: hasScrolledToBottom)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
