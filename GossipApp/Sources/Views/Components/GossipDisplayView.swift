@@ -32,7 +32,7 @@ struct GossipDisplayView: View {
                     Button(action: {
                         showingReportAlert = true
                     }) {
-                        Image(systemName: "exclamationmark.triangle.fill")
+                        Image(systemName: "light.beacon.max.fill")
                             .font(.system(size: 16))
                             .foregroundColor(.red.opacity(0.8))
                             .background(

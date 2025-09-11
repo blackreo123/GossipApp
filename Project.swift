@@ -23,17 +23,17 @@ let project = Project(
             resources: ["GossipApp/Resources/**"],
             dependencies: [
                 .external(name: "SocketIO"),
-                .target(name: "GossipCore")
+//                .target(name: "GossipCore")
             ]
         ),
-        .target(
-            name: "GossipCore",
-            destinations: .iOS,
-            product: .framework,
-            bundleId: "com.gossipapp.core",
-            deploymentTargets: .iOS("17.0"),
-            sources: ["GossipCore/Sources/**"]
-        ),
+//        .target(
+//            name: "GossipCore",
+//            destinations: .iOS,
+//            product: .framework,
+//            bundleId: "com.gossipapp.core",
+//            deploymentTargets: .iOS("17.0"),
+//            sources: ["GossipCore/Sources/**"]
+//        ),
         .target(
             name: "GossipAppTests",
             destinations: .iOS,
@@ -43,7 +43,7 @@ let project = Project(
             sources: ["GossipApp/Tests/**"],
             dependencies: [
                 .target(name: "GossipApp"),
-                .target(name: "GossipCore")
+//                .target(name: "GossipCore")
             ]
         )
     ]
