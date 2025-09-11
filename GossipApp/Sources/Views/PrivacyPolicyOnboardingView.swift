@@ -50,7 +50,7 @@ struct PrivacyPolicyOnboardingView: View {
                             Color.clear
                                 .frame(height: 1)
                                 .id("bottom")
-                                .onAppear { @MainActor in
+                                .onAppear {
                                     withAnimation(.spring()) {
                                         hasScrolledToBottom = true
                                     }
