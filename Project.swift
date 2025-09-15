@@ -11,9 +11,12 @@ let project = Project(
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
                 with: [
+                    "CFBundleDisplayName": "임귀당귀",  // 디바이스 표시명
+                    "CFBundleName": "임귀당귀",        // 앱 이름
                     "CFBundleShortVersionString": "1.0",
                     "CFBundleVersion": "1",
                     "UILaunchStoryboardName": "LaunchScreen",
+                    "ITSAppUsesNonExemptEncryption": false,  // 암호화 미사용 선언 (수출 규정 면제)
                     "NSAppTransportSecurity": [
                         "NSAllowsArbitraryLoads": true
                     ]
