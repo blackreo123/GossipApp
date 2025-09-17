@@ -252,7 +252,7 @@ xcodebuild test \
 ## 📞 연락처
 
 - **개발자**: [blackreo123](mailto:jihaapp1010@gmail.com)
-- **프로젝트 링크**: [https://github.com/blackreo123/gossip-app-ios](https://github.com/blackreo123/gossip-app-ios)
+- **프로젝트 링크**: [https://github.com/blackreo123/GossipApp/](https://github.com/blackreo123/GossipApp/)
 - **서버 저장소**: [https://github.com/blackreo123/gossip-server](https://github.com/blackreo123/gossip-server)
 
 ## 🙏 감사의 말
