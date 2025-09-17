@@ -7,10 +7,6 @@
 [![Tuist](https://img.shields.io/badge/Tuist-4.65.0-green.svg)](https://tuist.io/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-<div align="center">
-  <img src="Documentation/Images/app-preview.png" alt="5초 뒷담화 앱 미리보기" width="300">
-</div>
-
 ## ✨ 주요 기능
 
 - 🕵️ **완전 익명**: 사용자 식별 불가능, 개인정보 수집 최소화
@@ -23,9 +19,9 @@
 ## 📱 스크린샷
 
 <div align="center">
-    <img src="Documentation/Images/empty-state.png" alt="빈 상태" width="200">
-    <img src="Documentation/Images/composing.png" alt="작성 모드" width="200">
-    <img src="Documentation/Images/gossip-display.png" alt="뒷담화 표시" width="200">
+    <img width="200" alt="empty-state" src="https://github.com/user-attachments/assets/b50ac3e1-39cf-466a-a90a-9d4e732cdac3" />
+    <img width="200" alt="composing" src="https://github.com/user-attachments/assets/8c089d80-9cf6-4a28-aef6-e140183f0bde" />
+    <img width="200" alt="gossip-display" src="https://github.com/user-attachments/assets/ae6d8f8e-947b-4e4c-9c47-566555f52426" /> 
 </div>
 
 ## 🏗 기술 스택
