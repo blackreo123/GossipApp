@@ -25,15 +25,15 @@ struct PrivacyPolicyOnboardingView: View {
             VStack(spacing: 0) {
                 // 헤더
                 VStack(spacing: 16) {
-                    Text("😶‍🌫️")
+                    Text("🔒")
                         .font(.system(size: 60))
                     
-                    Text("5초 뒷담화")
+                    Text("개인정보 처리방침")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     
-                    Text("개인정보처리방침을 확인하고 시작해주세요")
+                    Text("안전한 개인정보 보호를 위해 확인해주세요")
                         .font(.body)
                         .foregroundColor(.white.opacity(0.8))
                         .multilineTextAlignment(.center)
@@ -98,12 +98,12 @@ struct PrivacyPolicyOnboardingView: View {
     
     private var privacyPolicyContent: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("개인정보처리방침")
+            Text("개인정보 처리방침")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(.white)
             
-            Text("최종 수정일: 2025년 9월 9일")
+            Text("최종 수정일: 2025년 9월 15일")
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.6))
             
@@ -167,38 +167,7 @@ struct PrivacyPolicyOnboardingView: View {
             )
             
             privacySection(
-                title: "6. 연락처",
-                content: """
-                    개인정보 관련 문의사항이 있으시면 언제든지 연락해주세요:
-                    
-                    📧 이메일: jihaapp1010@gmail.com
-                    
-                    모든 문의사항에 대해 빠르게 응답드리겠습니다.
-                    """
-            )
-            
-            privacySection(
-                title: "7. 정책 변경",
-                content: """
-                    개인정보처리방침이 변경되는 경우, 앱 업데이트를 통해 알려드립니다.
-                    
-                    중요한 변경사항이 있는 경우, 앱 실행 시 다시 동의를 받습니다.
-                    """
-            )
-            
-            privacySection(
-                title: "8. 쿠키 및 유사 기술",
-                content: """
-                    본 앱은 웹이 아닌 네이티브 앱이므로 쿠키를 사용하지 않습니다.
-                    
-                    • 웹뷰 사용 안 함
-                    • 추적 기술 사용 안 함
-                    • 광고 식별자 수집 안 함
-                    """
-            )
-            
-            privacySection(
-                title: "9. 보안 조치",
+                title: "6. 보안 조치",
                 content: """
                     사용자 데이터의 보안을 위해 다음과 같은 조치를 취합니다:
                     
@@ -210,15 +179,44 @@ struct PrivacyPolicyOnboardingView: View {
             )
             
             privacySection(
-                title: "10. 기타 중요사항",
+                title: "7. 쿠키 및 유사 기술",
+                content: """
+                    본 앱은 웹이 아닌 네이티브 앱이므로 쿠키를 사용하지 않습니다.
+                    
+                    • 웹뷰 사용 안 함
+                    • 추적 기술 사용 안 함
+                    • 광고 식별자 수집 안 함
+                    """
+            )
+            
+            privacySection(
+                title: "8. 연락처",
+                content: """
+                    개인정보 관련 문의사항이 있으시면 언제든지 연락해주세요:
+                    
+                    📧 이메일: jihaapp1010@gmail.com
+                    
+                    모든 문의사항에 대해 빠르게 응답드리겠습니다.
+                    """
+            )
+            
+            privacySection(
+                title: "9. 정책 변경",
+                content: """
+                    개인정보처리방침이 변경되는 경우, 앱 업데이트를 통해 알려드립니다.
+                    
+                    중요한 변경사항이 있는 경우, 앱 실행 시 다시 동의를 받습니다.
+                    """
+            )
+            
+            privacySection(
+                title: "10. 법적 근거",
                 content: """
                     본 개인정보처리방침은 대한민국 개인정보보호법을 준수합니다.
                     
-                    • 만 14세 미만 이용 권장하지 않음
-                    • 학교, 직장 등에서 부적절한 사용 금지
-                    • 타인에게 피해를 주는 내용 작성 금지
-                    
-                    건전한 소통 문화를 만들어 나가겠습니다.
+                    • 개인정보 최소 수집 원칙 준수
+                    • 목적 외 사용 금지
+                    • 안전한 관리 조치 이행
                     """
             )
         }

@@ -1,18 +1,11 @@
-//
-//  GossipDisplayView.swift
-//  GossipApp
-//
-//  Created by JIHA YOON on 2025/09/03.
-//
-
 import Foundation
 import SwiftUI
 
 struct GossipDisplayView: View {
     let currentGossip: String?
     let timeLeft: Int
-    @State private var showingReportAlert = false
-    @State private var showingReportConfirmation = false
+    @State private var showingReportSheet = false
+    @State private var reportingMessage: String = "" // 신고할 메시지 별도 저장
     
     var body: some View {
         VStack(spacing: 16) {
@@ -28,11 +21,12 @@ struct GossipDisplayView: View {
                         .padding(.horizontal, 40) // 신고 버튼 공간 확보
                         .padding(.vertical, 16)
                     
-                    // 신고 버튼
+                    // 강화된 신고 버튼
                     Button(action: {
-                        showingReportAlert = true
+                        reportingMessage = currentGossip // 현재 메시지를 별도 저장
+                        showingReportSheet = true
                     }) {
-                        Image(systemName: "light.beacon.max.fill")
+                        Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 16))
                             .foregroundColor(.red.opacity(0.8))
                             .background(
@@ -56,27 +50,41 @@ struct GossipDisplayView: View {
                         .fontWeight(.medium)
                         .foregroundColor(.white.opacity(0.8))
                     
-                    Text("답답한 마음을 적어보세요!")
-                        .font(.body)
-                        .foregroundColor(.white.opacity(0.6))
+                    VStack(spacing: 4) {
+                        Text("답답한 마음을 털어놓아 보세요")
+                            .font(.body)
+                            .foregroundColor(.white.opacity(0.6))
+                        
+                        Text("🔞 18세 이상 전용")
+                            .font(.caption)
+                            .foregroundColor(.red.opacity(0.7))
+                            .fontWeight(.semibold)
+                    }
                 }
             }
         }
         .frame(height: 200)
-        .alert("이 메시지를 신고하시겠습니까?", isPresented: $showingReportAlert) {
-            Button("취소", role: .cancel) { }
-            Button("신고", role: .destructive) {
-                // 로그만 남기고 끝
-                print("📋 신고됨: \(currentGossip ?? "")")
-                showingReportConfirmation = true
-            }
-        } message: {
-            Text("부적절한 내용으로 판단되면 검토 후 조치됩니다.")
-        }
-        .alert("신고 완료", isPresented: $showingReportConfirmation) {
-            Button("확인") { }
-        } message: {
-            Text("신고해주셔서 감사합니다.")
+        // 중요: sheet를 VStack 밖으로 이동하여 5초 타이머와 독립
+        .sheet(isPresented: $showingReportSheet) {
+            ReportMessageView(
+                messageContent: reportingMessage, // 별도 저장된 메시지 사용
+                isPresented: $showingReportSheet
+            )
         }
     }
+}
+
+#Preview {
+    VStack(spacing: 20) {
+        GossipDisplayView(
+            currentGossip: "이것은 테스트 메시지입니다",
+            timeLeft: 3
+        )
+        
+        GossipDisplayView(
+            currentGossip: nil,
+            timeLeft: 0
+        )
+    }
+    .background(Color.black)
 }
