@@ -251,9 +251,9 @@ xcodebuild test \
 
 ## 📞 연락처
 
-- **개발자**: [Your Name](mailto:your.email@example.com)
-- **프로젝트 링크**: [https://github.com/yourusername/gossip-app-ios](https://github.com/yourusername/gossip-app-ios)
-- **서버 저장소**: [https://github.com/yourusername/gossip-app-server](https://github.com/yourusername/gossip-app-server)
+- **개발자**: [blackreo123](mailto:jihaapp1010@gmail.com)
+- **프로젝트 링크**: [https://github.com/blackreo123/gossip-app-ios](https://github.com/blackreo123/gossip-app-ios)
+- **서버 저장소**: [https://github.com/blackreo123/gossip-app-server](https://github.com/blackreo123/gossip-app-server)
 
 ## 🙏 감사의 말
 
