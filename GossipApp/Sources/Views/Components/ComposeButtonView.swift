@@ -26,7 +26,7 @@ struct ComposeButtonView: View {
     var body: some View {
         if isComposing {
             VStack(spacing: 16) {
-                TextField("뒷담화를 입력하세요...", text: $newMessage)
+                TextField("답답한 마음을 여기에 입력하세요...", text: $newMessage)
                     .textFieldStyle(PlainTextFieldStyle())
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
@@ -78,7 +78,7 @@ struct ComposeButtonView: View {
                 HStack(spacing: 8) {
                     if gossipManager.dailyUsage < 3 {
                         Image(systemName: "plus")
-                        Text("뒷담화")
+                        Text("털어놓기")
                     } else {
                         Text("내일 또 만나요")
                     }
