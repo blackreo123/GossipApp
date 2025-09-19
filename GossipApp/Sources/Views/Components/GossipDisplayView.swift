@@ -3,13 +3,22 @@ import SwiftUI
 
 struct GossipDisplayView: View {
     let currentGossip: String?
+    let currentGossipDeviceId: String? // 메시지 작성자 ID 추가
     let timeLeft: Int
     @State private var showingReportSheet = false
-    @State private var reportingMessage: String = "" // 신고할 메시지 별도 저장
+    @State private var reportingMessage: String = ""
+    @State private var reportingDeviceId: String? = nil
+    
+    // 로컬 필터링을 위한 상태
+    @State private var hiddenMessages: Set<String> = []
+    @State private var blockedUsers: Set<String> = []
     
     var body: some View {
         VStack(spacing: 16) {
-            if let currentGossip = currentGossip {
+            if let currentGossip = currentGossip,
+               let deviceId = currentGossipDeviceId,
+               !shouldHideMessage(currentGossip, deviceId: deviceId) {
+                
                 // 메시지 영역
                 ZStack(alignment: .topTrailing) {
                     // 메시지 텍스트
@@ -21,21 +30,24 @@ struct GossipDisplayView: View {
                         .padding(.horizontal, 40) // 신고 버튼 공간 확보
                         .padding(.vertical, 16)
                     
-                    // 강화된 신고 버튼
-                    Button(action: {
-                        reportingMessage = currentGossip // 현재 메시지를 별도 저장
-                        showingReportSheet = true
-                    }) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(.red.opacity(0.8))
-                            .background(
-                                Circle()
-                                    .fill(Color.black.opacity(0.3))
-                                    .frame(width: 28, height: 28)
-                            )
+                    // 신고 버튼 (자기 메시지가 아닐 때만 표시)
+                    if !isMyMessage(deviceId) {
+                        Button(action: {
+                            reportingMessage = currentGossip
+                            reportingDeviceId = deviceId
+                            showingReportSheet = true
+                        }) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(.red.opacity(0.8))
+                                .background(
+                                    Circle()
+                                        .fill(Color.black.opacity(0.3))
+                                        .frame(width: 28, height: 28)
+                                )
+                        }
+                        .padding(.top, 12)
                     }
-                    .padding(.top, 12)
                 }
                 .frame(maxWidth: .infinity)
                 
@@ -64,12 +76,75 @@ struct GossipDisplayView: View {
             }
         }
         .frame(height: 200)
-        // 중요: sheet를 VStack 밖으로 이동하여 5초 타이머와 독립
+        .onAppear {
+            loadLocalFilters()
+            setupNotificationObservers()
+        }
         .sheet(isPresented: $showingReportSheet) {
             ReportMessageView(
-                messageContent: reportingMessage, // 별도 저장된 메시지 사용
+                messageContent: reportingMessage,
+                messageDeviceId: reportingDeviceId,
                 isPresented: $showingReportSheet
             )
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    /// 자기가 작성한 메시지인지 확인
+    private func isMyMessage(_ messageDeviceId: String) -> Bool {
+        let myDeviceId = UserDefaults.standard.string(forKey: "deviceId") ?? ""
+        return messageDeviceId == myDeviceId
+    }
+    
+    /// 메시지를 숨겨야 하는지 판단
+    private func shouldHideMessage(_ content: String, deviceId: String) -> Bool {
+        // 1. 숨겨진 메시지인지 확인
+        if hiddenMessages.contains(content) {
+            return true
+        }
+        
+        // 2. 차단된 사용자의 메시지인지 확인
+        if blockedUsers.contains(deviceId) {
+            return true
+        }
+        
+        return false
+    }
+    
+    /// 로컬 필터 데이터 로드
+    private func loadLocalFilters() {
+        // 숨겨진 메시지 로드
+        let hiddenArray = UserDefaults.standard.array(forKey: "hiddenMessages") as? [String] ?? []
+        hiddenMessages = Set(hiddenArray)
+        
+        // 차단된 사용자 로드
+        let blockedArray = UserDefaults.standard.array(forKey: "blockedUsers") as? [String] ?? []
+        blockedUsers = Set(blockedArray)
+    }
+    
+    /// 알림 옵저버 설정
+    private func setupNotificationObservers() {
+        // 메시지 숨김 알림
+        NotificationCenter.default.addObserver(
+            forName: .hideMessageLocally,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let messageContent = notification.userInfo?["messageContent"] as? String {
+                hiddenMessages.insert(messageContent)
+            }
+        }
+        
+        // 사용자 차단 알림
+        NotificationCenter.default.addObserver(
+            forName: .blockUserLocally,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let deviceId = notification.userInfo?["deviceId"] as? String {
+                blockedUsers.insert(deviceId)
+            }
         }
     }
 }
@@ -78,11 +153,13 @@ struct GossipDisplayView: View {
     VStack(spacing: 20) {
         GossipDisplayView(
             currentGossip: "이것은 테스트 메시지입니다",
+            currentGossipDeviceId: "test-device-id",
             timeLeft: 3
         )
         
         GossipDisplayView(
             currentGossip: nil,
+            currentGossipDeviceId: nil,
             timeLeft: 0
         )
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ReportMessageView: View {
     let messageContent: String
+    let messageDeviceId: String? // 메시지 작성자 ID 추가
     @Binding var isPresented: Bool
     @StateObject private var reportManager = ReportManager()
     @StateObject private var toastManager = ToastManager()
@@ -10,6 +11,8 @@ struct ReportMessageView: View {
     @State private var additionalComment = ""
     @State private var isSubmitting = false
     @State private var showConfirmation = false
+    @State private var willBlockUser = false
+    @State private var willHideMessage = true
     
     var body: some View {
         NavigationView {
@@ -21,6 +24,7 @@ struct ReportMessageView: View {
                         headerSection
                         messageConfirmationSection
                         reasonSelectionSection
+                        actionOptionsSection
                         additionalCommentSection
                         submitButtonSection
                         contactSection
@@ -153,6 +157,74 @@ struct ReportMessageView: View {
         .animation(.spring(response: 0.3), value: selectedReason)
     }
     
+    // 새로 추가: 액션 옵션 섹션
+    private var actionOptionsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("추가 조치")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            VStack(spacing: 12) {
+                // 메시지 숨김 옵션
+                HStack {
+                    Button(action: {
+                        willHideMessage.toggle()
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: willHideMessage ? "checkmark.square.fill" : "square")
+                                .foregroundColor(willHideMessage ? .blue : .white.opacity(0.6))
+                                .font(.system(size: 20))
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("이 메시지 숨기기")
+                                    .foregroundColor(.white)
+                                    .fontWeight(.medium)
+                                
+                                Text("내 화면에서 즉시 제거됩니다")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
+                            
+                            Spacer()
+                        }
+                    }
+                }
+                
+                // 사용자 차단 옵션
+                if messageDeviceId != nil {
+                    HStack {
+                        Button(action: {
+                            willBlockUser.toggle()
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: willBlockUser ? "checkmark.square.fill" : "square")
+                                    .foregroundColor(willBlockUser ? .red : .white.opacity(0.6))
+                                    .font(.system(size: 20))
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("이 사용자 차단")
+                                        .foregroundColor(.white)
+                                        .fontWeight(.medium)
+                                    
+                                    Text("향후 이 사용자의 모든 메시지가 숨겨집니다")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(0.05))
+            )
+        }
+    }
+    
     private var additionalCommentSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("추가 설명 (선택사항)")
@@ -222,6 +294,16 @@ struct ReportMessageView: View {
             isSubmitting = true
             defer { isSubmitting = false }
             
+            // 1. 선택된 액션들 즉시 실행
+            if willHideMessage {
+                hideMessageLocally()
+            }
+            
+            if willBlockUser, let deviceId = messageDeviceId {
+                blockUserLocally(deviceId)
+            }
+            
+            // 2. 서버에 신고 제출
             let result = await reportManager.reportMessage(messageContent, reason: selectedReason)
             
             switch result {
@@ -238,6 +320,44 @@ struct ReportMessageView: View {
             }
         }
     }
+    
+    private func hideMessageLocally() {
+        // 로컬에서 메시지 숨김
+        var hiddenMessages = Set(UserDefaults.standard.array(forKey: "hiddenMessages") as? [String] ?? [])
+        hiddenMessages.insert(messageContent)
+        UserDefaults.standard.set(Array(hiddenMessages), forKey: "hiddenMessages")
+        
+        // 알림 발송
+        NotificationCenter.default.post(
+            name: .hideMessageLocally,
+            object: nil,
+            userInfo: ["messageContent": messageContent]
+        )
+        
+        toastManager.showSuccess("메시지가 숨겨졌습니다")
+    }
+    
+    private func blockUserLocally(_ deviceId: String) {
+        // 로컬에서 사용자 차단
+        var blockedUsers = Set(UserDefaults.standard.array(forKey: "blockedUsers") as? [String] ?? [])
+        blockedUsers.insert(deviceId)
+        UserDefaults.standard.set(Array(blockedUsers), forKey: "blockedUsers")
+        
+        // 알림 발송
+        NotificationCenter.default.post(
+            name: .blockUserLocally,
+            object: nil,
+            userInfo: ["deviceId": deviceId]
+        )
+        
+        toastManager.showSuccess("사용자가 차단되었습니다")
+    }
+}
+
+// MARK: - Notification Names
+extension Notification.Name {
+    static let hideMessageLocally = Notification.Name("hideMessageLocally")
+    static let blockUserLocally = Notification.Name("blockUserLocally")
 }
 
 #Preview {
@@ -245,6 +365,7 @@ struct ReportMessageView: View {
     
     ReportMessageView(
         messageContent: "이것은 테스트 메시지입니다",
+        messageDeviceId: "test-device-id",
         isPresented: $isPresented
     )
 }

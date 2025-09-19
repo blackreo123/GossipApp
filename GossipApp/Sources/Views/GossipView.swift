@@ -1,10 +1,3 @@
-//
-//  GossipView.swift
-//  GossipApp
-//
-//  Created by JIHA YOON on 2025/09/09.
-//
-
 import SwiftUI
 
 struct GossipView: View {
@@ -28,7 +21,12 @@ struct GossipView: View {
                 
                 Spacer()
                 
-                GossipDisplayView(currentGossip: gossipManager.currentGossip, timeLeft: gossipManager.timeLeft)
+                // 업데이트된 파라미터 전달
+                GossipDisplayView(
+                    currentGossip: gossipManager.currentGossip,
+                    currentGossipDeviceId: gossipManager.currentGossipDeviceId, // 새로 추가
+                    timeLeft: gossipManager.timeLeft
+                )
                 
                 Spacer()
                 
@@ -48,7 +46,7 @@ struct GossipView: View {
                 } catch let error as GossipError {
                     toastManager.show(error.toastMessage)
                 } catch {
-                    toastManager.showError("An unexpected error occurred.")
+                    toastManager.showError("알 수 없는 오류가 발생했습니다.")
                 }
             }
         }
@@ -69,6 +67,5 @@ struct GossipView: View {
 }
 
 #Preview {
-    ContentView()
+    GossipView()
 }
-
